@@ -83,32 +83,26 @@ public class Logic implements ActionListener, KeyListener {
         gameLoop.start();
     }
 
-    // menghubungkan logika dengan kanvas tampilan
     public void setView(View view) {
         this.view = view;
     }
 
-    // mengambil status permainan saat ini
     public State getState() {
         return state;
     }
 
-    // mengubah status permainan
     public void setState(State state) {
         this.state = state;
     }
 
-    // mengambil objek pemain burung
     public Player getPlayer() {
         return player;
     }
 
-    // mengambil daftar pipa aktif
     public ArrayList<Pipe> getPipes() {
         return pipes;
     }
 
-    // memunculkan sepasang pipa secara acak
     public void placePipes() {
         int randomPosY = (int) (pipeStartPosY - (pipeHeight / 4) - Math.random() * (pipeHeight / 2));
         int openingSpace = frameHeight / 4;
@@ -132,7 +126,7 @@ public class Logic implements ActionListener, KeyListener {
     }
 
     // memicu animasi kekalahan saat burung menabrak pipa atau tanah
-    public void death() {
+    public void die() {
         if (state == State.DYING || state == State.GAMEOVER) return;
 
         state = State.DYING;
@@ -140,12 +134,11 @@ public class Logic implements ActionListener, KeyListener {
         hitSound.play();
         player.setVelocityY(-5);
 
-        // membunyikan suara mati setelah jeda singkat
         Timer dieTimer = new Timer(350, e -> dieSound.play());
         dieTimer.setRepeats(false);
         dieTimer.start();
 
-        // memunculkan tampilan game over setelah jeda singkat
+        // memunculkan tampilan game over dan hentikan logic game setelah jeda singkat
         Timer stopTimer = new Timer(800, e -> {
             view.showGameOver();
             state = State.GAMEOVER;
@@ -181,7 +174,7 @@ public class Logic implements ActionListener, KeyListener {
 
         // memeriksa tabrakan burung dengan tanah
         if (player.getPosY() > 550) {
-            death();
+            die();
             return;
         }
 
@@ -208,7 +201,7 @@ public class Logic implements ActionListener, KeyListener {
                     : player.getPosY() + player.getHeight() > pipe.getPosY();
 
             if (insideX && insideY) {
-                death();
+                die();
                 break;
             }
         }
@@ -232,17 +225,14 @@ public class Logic implements ActionListener, KeyListener {
         }
     }
 
-    // mengambil skor pemain saat ini
     public int getScore() {
         return score;
     }
 
-    // mengambil posisi x latar belakang
     public int getBackgroundX() {
         return backgroundX;
     }
 
-    // memicu pergerakan dan render setiap frame
     @Override
     public void actionPerformed(ActionEvent e) {
         move();
@@ -258,7 +248,7 @@ public class Logic implements ActionListener, KeyListener {
     // menangani input tombol dari pengguna
     @Override
     public void keyPressed(KeyEvent e) {
-        // memulai terbang dari kondisi ready
+        // space untuk memulai terbang jika state game adalah ready
         if (state == State.READY && (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP)) {
             state = State.PLAYING;
             pipesCooldown.start();
@@ -270,14 +260,14 @@ public class Logic implements ActionListener, KeyListener {
             return;
         }
 
-        // melompat saat burung sedang terbang aktif
+        // space untuk melompat jika state game adalah playing
         if (state == State.PLAYING && (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_UP)) {
             player.setVelocityY(-10);
             jumpSound.play();
             return;
         }
 
-        // mengulang permainan saat game over
+        // R untuk mengulang permainan jika state game adalah game over
         if (state == State.GAMEOVER && e.getKeyCode() == KeyEvent.VK_R) {
             resetGame();
         }

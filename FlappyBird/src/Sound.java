@@ -7,7 +7,6 @@ import java.net.URL;
 public class Sound {
     private AudioFormat format;
     private byte[] audioData;
-    private Clip loopClip;
 
     public Sound(String assetPath) {
         try {
@@ -55,29 +54,5 @@ public class Sound {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    public void loop() {
-        if (audioData == null || format == null) return;
-        try {
-            if (loopClip != null && loopClip.isRunning()) return;
-
-            ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
-            AudioInputStream stream = new AudioInputStream(bais, format, audioData.length / format.getFrameSize());
-
-            loopClip = AudioSystem.getClip();
-            loopClip.open(stream);
-            loopClip.loop(Clip.LOOP_CONTINUOUSLY);
-        } catch (LineUnavailableException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void stop() {
-        if (loopClip != null) {
-            loopClip.stop();
-            loopClip.close();
-            loopClip = null;
-        }
     }
 }
